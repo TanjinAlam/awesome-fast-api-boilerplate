@@ -50,3 +50,19 @@ session: Union[AsyncSession, async_scoped_session] = async_scoped_session(
     scopefunc=get_session_context,
 )
 Base = declarative_base()
+
+# Define your SQLAlchemy models here as subclasses of Base
+
+
+def create_tables():
+    # Call this function to create all the defined tables in the database
+    Base.metadata.create_all(bind=engines["writer"])
+
+
+session: Union[AsyncSession, async_scoped_session] = async_scoped_session(
+    session_factory=async_session_factory,
+    scopefunc=get_session_context,
+)
+
+# Call create_tables to create tables before performing any operations on the database
+create_tables()
