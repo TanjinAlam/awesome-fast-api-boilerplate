@@ -7,11 +7,13 @@ authors = ["Hide <padocon@naver.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 alembic = "^1.8.1"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.40"}
+SQLAlchemy = "^2.0.15"
 asyncpg = "0.28.0"
 parsel = "1.8.1"
+pydantic = "^1.10.8"
+anyio = "^3.6.2"
 PyJWT = "^2.4.0"
-uvicorn = "^0.18.3"
+uvicorn = "^0.22.0"
 fastapi = "^0.81.0"
 celery = "^5.2.7"
 gunicorn = "^20.1.0"

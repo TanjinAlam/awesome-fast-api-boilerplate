@@ -2,10 +2,16 @@ import os
 
 import click
 import uvicorn
-
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+)
 from core.config import config
+engines = {
+    "writer": create_async_engine(config.WRITER_DB_URL, pool_recycle=3600),
+    "reader": create_async_engine(config.READER_DB_URL, pool_recycle=3600),
+}
 
-
+import asyncio
 @click.command()
 @click.option(
     "--env",
@@ -32,3 +38,7 @@ def main(env: str, debug: bool):
 
 if __name__ == "__main__":
     main()
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(create_all_tables())
+
+

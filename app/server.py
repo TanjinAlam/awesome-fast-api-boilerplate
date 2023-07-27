@@ -79,7 +79,7 @@ def create_app() -> FastAPI:
         docs_url=None if config.ENV == "production" else "/docs",
         redoc_url=None if config.ENV == "production" else "/redoc",
         dependencies=[Depends(Logging)],
-        middleware=make_middleware(),
+        # middleware=make_middleware(),
     )
     init_routers(app_=app_)
     init_listeners(app_=app_)
