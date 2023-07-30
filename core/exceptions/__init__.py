@@ -8,6 +8,7 @@ from .base import (
     UnauthorizedException,
 )
 from .token import DecodeTokenException, ExpiredTokenException
+from .database import DatabaseTokenException
 from .user import (
     PasswordDoesNotMatchException,
     DuplicateEmailOrNicknameException,
@@ -28,4 +29,5 @@ __all__ = [
     "PasswordDoesNotMatchException",
     "DuplicateEmailOrNicknameException",
     "UserNotFoundException",
+    "DatabaseTokenException",
 ]

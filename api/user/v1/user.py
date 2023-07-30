@@ -1,8 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Query
-from core.db import get_db
-from core.db.session import get_async_session
+from core.db import get_db, get_async_session
 from api.user.v1.request.user import LoginRequest
 from api.user.v1.response.user import LoginResponse
 from app.user.schemas import (
@@ -24,16 +23,23 @@ from sqlalchemy import create_engine, Column, Integer, String, select
 from fastapi.security import HTTPAuthorizationCredentials
 from core.utils.token_helper import TokenHelper
 from app.user.models import User
+from app.database.schemas import DatabaseCredential
 
 user_router = APIRouter()
 
 
-@user_router.get('/test')
-async def all_user(db = Depends(get_async_session)):
-    
-    bla= await UserService(db).get_user_list(limit=2, prev=0)
-    print(bla)
-    return bla
+
+
+@user_router.post('/test-token')
+async def dummy_token(
+    cred :DatabaseCredential
+    ):
+    return TokenHelper.encode(payload=cred.dict())
+
+@user_router.get('/test-all-user')
+async def all_user(db : HTTPAuthorizationCredentials = Depends(get_async_session)):
+    all_users= await UserService(db).get_user_list(limit=2, prev=0)
+    return all_users
 
 
 

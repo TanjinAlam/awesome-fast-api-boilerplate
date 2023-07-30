@@ -5,6 +5,7 @@ import jwt
 from core.config import config
 from core.exceptions import DecodeTokenException, ExpiredTokenException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from app.database.schemas import DatabaseCredential
 from fastapi import Depends
 
 security = HTTPBearer()
@@ -61,4 +62,31 @@ class TokenHelper:
             raise ExpiredTokenException
         if decoded:
             return decoded
+    
+        
+    @staticmethod
+    def is_valid_database_token(authorization: HTTPAuthorizationCredentials = Depends(security)):
+        try:
+            decoded = jwt.decode(
+                authorization.credentials,
+                config.JWT_SECRET_KEY,
+                config.JWT_ALGORITHM,
+            )
+        except jwt.exceptions.DecodeError:
+            raise DecodeTokenException
+        except jwt.exceptions.ExpiredSignatureError:
+            raise ExpiredTokenException
+        if decoded:
+            cred =  DatabaseCredential(user_name=decoded['user_name'],
+                                      password=decoded['password'],
+                                      host_name=decoded['host_name'],
+                                      database_name=decoded['database_name'],
+                                      port=decoded['port'])
+            return cred
+            
+
+
+
+
+
 
