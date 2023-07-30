@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Query
 from core.db import get_db
+from core.db.session import get_async_session
 from api.user.v1.request.user import LoginRequest
 from api.user.v1.response.user import LoginResponse
 from app.user.schemas import (
@@ -28,8 +29,13 @@ user_router = APIRouter()
 
 
 @user_router.get('/test')
-async def all_user(token: HTTPAuthorizationCredentials = Depends(TokenHelper.is_valid_token)):
-    return token
+async def all_user(db = Depends(get_async_session)):
+    
+    bla= await UserService(db).get_user_list(limit=2, prev=0)
+    print(bla)
+    return bla
+
+
 
 @user_router.get(
     "",
@@ -45,6 +51,9 @@ async def get_user_list(
     # token: HTTPAuthorizationCredentials = Depends(TokenHelper.is_valid_token),
 ):
     return await UserService(db).get_user_list(limit=limit, prev=prev)
+
+
+
 
 @user_router.post(
     "",

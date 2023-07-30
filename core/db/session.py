@@ -63,23 +63,19 @@
 
 # Define your SQLAlchemy models here as subclasses of Base
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends,HTTPException
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String, select
 from sqlalchemy.orm import sessionmaker, Session, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-
+import asyncio
+from sqlalchemy_utils import database_exists
 # SQLALCHEMY 
-engine = create_async_engine("postgresql+asyncpg://postgres:password@localhost:5432/postgres",pool_pre_ping=True)
+engine = create_async_engine("postgresql+asyncpg://manuel:jw8s0F4@localhost:5432/profile",pool_pre_ping=True)
 SessionLocal = async_sessionmaker(engine)
 
 class Base(DeclarativeBase):
     pass
-
-# class User(Base):
-#     __tablename__ = "users"
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     username: Mapped[str] = mapped_column(unique=True)
 
 async def get_db():
     async with engine.begin() as conn:
@@ -90,3 +86,67 @@ async def get_db():
         yield db
     finally:
         await db.close()
+
+
+
+
+
+
+
+class DatabaseHandler:
+    def __init__(self, user_name : str, password : str, host_name : str, database : str, port : str):
+        self.engine = create_async_engine(f"postgresql+asyncpg://{user_name}:{password}@{host_name}:{port}/{database}",pool_pre_ping=True)
+        self.SessionLocal = async_sessionmaker(self.engine)
+    # class Base(DeclarativeBase):
+    #     pass
+    async def get_db(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        db = self.SessionLocal()
+        try:
+            yield db
+        finally:
+            await db.close()
+
+
+
+# Function to check if a database exists asynchronously
+async def check_database_exists(db_url : str) -> bool:
+    return await asyncio.to_thread(database_exists, db_url)
+
+
+
+# Create a function to get the async session
+async def get_async_session(
+    user_name : str, password : str, host_name : str, database_name : str, port : str
+) -> AsyncSession:
+    # Verify the credentials, you can implement your own logic here
+    # if user_name != "valid_username" or password != "valid_password" or database_name != "valid_database_name":
+    #     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Form the database URL based on the input parameters
+    db_url = f"postgresql+asyncpg://{user_name}:{password}@{host_name}:{port}/{database_name}"
+    # Create the async engine for the specified database URL
+    is_database = await check_database_exists(db_url)
+    if not is_database:
+        raise 
+    async_engine = create_async_engine(db_url)
+
+    # Create the session factory
+    sessionmaker_class = async_sessionmaker(
+        async_engine
+        #   class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+        db = sessionmaker_class()
+        try:
+            yield db
+        finally:
+            await db.close()
+
+    # # Create the async session
+    # async with sessionmaker_class() as session:
+    #     yield session
