@@ -24,18 +24,19 @@ from app.user.models import User
 user_router = APIRouter()
 
 
-# @user_router.get(
-#     "",
-#     response_model=List[GetUserListResponseSchema],
-#     response_model_exclude={"id"},
-#     responses={"400": {"model": ExceptionResponseSchema}},
-#     dependencies=[Depends(PermissionDependency([IsAdmin]))],
-# )
-# async def get_user_list(
-#     limit: int = Query(10, description="Limit"),
-#     prev: int = Query(None, description="Prev ID"),
-# ):
-#     return await UserService().get_user_list(limit=limit, prev=prev)
+@user_router.get(
+    "",
+    # response_model=List[GetUserListResponseSchema],
+    # response_model_exclude={"id"},
+    # responses={"400": {"model": ExceptionResponseSchema}},
+    # dependencies=[Depends(PermissionDependency([IsAdmin]))],
+)
+async def get_user_list(
+    limit: int = Query(10, description="Limit"),
+    prev: int = Query(None, description="Prev ID"),
+    db: AsyncSession = Depends(get_db)
+):
+    return await UserService(db).get_user_list(limit=limit, prev=prev)
 
 @user_router.post(
     "",
@@ -68,22 +69,6 @@ async def create_user(request: CreateUserRequestSchema, db: AsyncSession = Depen
     return {"email": request.email, "nickname": request.nickname}
 
 
-# @user_router.post(
-#     "",
-#     response_model=CreateUserResponseSchema,
-#     responses={"400": {"model": ExceptionResponseSchema}},
-# )
-# async def create_user(request: CreateUserRequestSchema, db: AsyncSession = Depends(get_db)):
-#     print("**request.dict()**request.dict()**request.dict()",request.dict())
-#     await UserService().create_user(request.dict())
-#     # print('request',request)
-#     # db_user = User(email=request.email, password=request.password1,
-#     #                nickname=request.nickname)
-#     # db.add(db_user)
-#     # await db.commit()
-#     # await db.refresh(db_user)
-#     return {"email": request.email, "nickname": request.nickname}
-
 
 @user_router.post(
     "/login",
@@ -92,5 +77,4 @@ async def create_user(request: CreateUserRequestSchema, db: AsyncSession = Depen
 )
 async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     token = await UserService(db).login(email=request.email, password=request.password)
-    return token
     return {"token": token.token, "refresh_token": token.refresh_token}

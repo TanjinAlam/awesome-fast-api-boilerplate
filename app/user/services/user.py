@@ -36,7 +36,7 @@ class UserService:
             limit = 12
 
         query = query.limit(limit)
-        result = await session.execute(query)
+        result = await self.db.execute(query)
         return result.scalars().all()
 
     # @Transactional()
@@ -67,7 +67,7 @@ class UserService:
         result = await self.db.execute(
             select(User).where(User.email == email))
         
-        is_exist = result.scalars().one()
+        is_exist = result.scalars().first()
 
         # # statement = select(User).where(User.email == email)
         # # result = await self.db.execute(statement)
