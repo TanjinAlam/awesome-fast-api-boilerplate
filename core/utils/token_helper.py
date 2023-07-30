@@ -4,7 +4,10 @@ import jwt
 
 from core.config import config
 from core.exceptions import DecodeTokenException, ExpiredTokenException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends
 
+security = HTTPBearer()
 
 class TokenHelper:
     @staticmethod
@@ -43,3 +46,19 @@ class TokenHelper:
             )
         except jwt.exceptions.DecodeError:
             raise DecodeTokenException
+        
+    @staticmethod
+    def is_valid_token(authorization: HTTPAuthorizationCredentials = Depends(security)):
+        try:
+            decoded = jwt.decode(
+                authorization.credentials,
+                config.JWT_SECRET_KEY,
+                config.JWT_ALGORITHM,
+            )
+        except jwt.exceptions.DecodeError:
+            raise DecodeTokenException
+        except jwt.exceptions.ExpiredSignatureError:
+            raise ExpiredTokenException
+        if decoded:
+            return decoded
+

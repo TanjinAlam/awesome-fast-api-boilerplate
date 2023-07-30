@@ -15,14 +15,21 @@ from core.fastapi.dependencies import (
     PermissionDependency,
     IsAdmin,
 )
+from typing import Optional, Union
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, Column, Integer, String, select
 
+from fastapi.security import HTTPAuthorizationCredentials
+from core.utils.token_helper import TokenHelper
 from app.user.models import User
 
 user_router = APIRouter()
 
+
+@user_router.get('/test')
+async def all_user(token: HTTPAuthorizationCredentials = Depends(TokenHelper.is_valid_token)):
+    return "working"
 
 @user_router.get(
     "",
@@ -34,7 +41,8 @@ user_router = APIRouter()
 async def get_user_list(
     limit: int = Query(10, description="Limit"),
     prev: int = Query(None, description="Prev ID"),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    # token: HTTPAuthorizationCredentials = Depends(TokenHelper.is_valid_token),
 ):
     return await UserService(db).get_user_list(limit=limit, prev=prev)
 
