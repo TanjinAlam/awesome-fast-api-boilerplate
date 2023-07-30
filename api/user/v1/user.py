@@ -29,7 +29,7 @@ user_router = APIRouter()
 
 @user_router.get('/test')
 async def all_user(token: HTTPAuthorizationCredentials = Depends(TokenHelper.is_valid_token)):
-    return "working"
+    return token
 
 @user_router.get(
     "",
