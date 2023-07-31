@@ -5,7 +5,7 @@ import jwt
 from core.config import config
 from core.exceptions import DecodeTokenException, ExpiredTokenException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from app.database.schemas import DatabaseCredential
+from app.database.services.database import DatabaseService
 from fastapi import Depends
 
 security = HTTPBearer()
@@ -77,12 +77,8 @@ class TokenHelper:
         except jwt.exceptions.ExpiredSignatureError:
             raise ExpiredTokenException
         if decoded:
-            cred =  DatabaseCredential(user_name=decoded['user_name'],
-                                      password=decoded['password'],
-                                      host_name=decoded['host_name'],
-                                      database_name=decoded['database_name'],
-                                      port=decoded['port'])
-            return cred
+            credentials = DatabaseService().build_credentials(decoded)
+            return credentials
             
 
 

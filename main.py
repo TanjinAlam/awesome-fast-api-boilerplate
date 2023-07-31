@@ -11,7 +11,7 @@ engines = {
     "reader": create_async_engine(config.READER_DB_URL, pool_recycle=3600),
 }
 
-import asyncio
+
 @click.command()
 @click.option(
     "--env",
@@ -31,14 +31,11 @@ def main(env: str, debug: bool):
         app="app.server:app",
         host=config.APP_HOST,
         port=config.APP_PORT,
-        reload=True if config.ENV != "production" else False,
-        workers=1,
+        reload=True if config.ENV != "production" else False
     )
 
 
 if __name__ == "__main__":
     main()
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(create_all_tables())
 
 

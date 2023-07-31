@@ -32,7 +32,7 @@ class IsAdmin(BasePermission):
         if not user_id:
             return False
 
-        return await UserService().is_admin(user_id=user_id)
+        # return await UserService().is_admin(user_id=user_id)
 
 
 class AllowAll(BasePermission):

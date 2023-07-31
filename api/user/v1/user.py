@@ -36,6 +36,12 @@ async def dummy_token(
     ):
     return TokenHelper.encode(payload=cred.dict())
 
+@user_router.post('/test-user')
+async def dummy_user(
+    cred :DatabaseCredential
+    ):
+    return TokenHelper.encode(payload=cred.dict())
+
 @user_router.get('/test-all-user')
 async def all_user(db : HTTPAuthorizationCredentials = Depends(get_async_session)):
     all_users= await UserService(db).get_user_list(limit=2, prev=0)

@@ -11,13 +11,16 @@ from core.exceptions import (
     UserNotFoundException,
 )
 from core.utils.token_helper import TokenHelper
-from sqlalchemy.orm import sessionmaker, Session, DeclarativeBase, Mapped, mapped_column
-
+from sqlalchemy.orm import  Session
 from core.db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import  Depends
 from sqlalchemy.sql import func, text
 from app.user.models import User
+
+# TODO fix up the service style
+
+
 class UserService:
     def __init__(self, db: Session):
         self.db = db
@@ -56,6 +59,8 @@ class UserService:
     #     user = User(email=email, password=password1, nickname=nickname)
     #     session.add(user)
 
+
+
     # @Transactional()
     async def create(
     self, email: str, password1: str, password2: str, nickname: str,
@@ -88,6 +93,7 @@ class UserService:
         self.db.add(user)
         await self.db.commit()
         await self.db.refresh(user)
+
 
     async def is_admin(self, user_id: int) -> bool:
         result = await session.execute(select(User).where(User.id == user_id))
